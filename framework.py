@@ -20,10 +20,10 @@
 #parse command line argument
 import argparse
 parser = argparse.ArgumentParser(description="Run and cluster a genetic algorithm based on a fitness function")
-parser.add_argument('-k' , '--num-clusters',      help='number of clusters',            required=True)
-parser.add_argument('-ga', '--genetic-algorithm', help='location of genetic algorithm', required=True)
-parser.add_argument('-ca', '--cluster-algorithm', help='location of cluster algorithm', required=True)
-parser.add_argument('-ff', '--fitness-function',  help='location of fitness function',  required=True)
+parser.add_argument('-k' , '--num-clusters',      help='number of clusters',                                  required=True)
+parser.add_argument('-ga', '--genetic-algorithm', help='location of file with do_genetic_algorithm function', required=True)
+parser.add_argument('-ca', '--cluster-algorithm', help='location of file with do_cluster_algorithm function', required=True)
+parser.add_argument('-ff', '--fitness-function',  help='location of file with do_fitness_function function',  required=True)
 args = parser.parse_args()
 
 ga = __import__(args.genetic_algorithm)
