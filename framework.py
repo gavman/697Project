@@ -31,6 +31,7 @@ ca = __import__(args.cluster_algorithm)
 ff = __import__(args.fitness_function)
 num_clusters = args.num_clusters
 
+
 old_gen = 1 # initial data
 new_gen = 0
 
@@ -39,6 +40,6 @@ new_gen = 0
 # then pick which clusters to keep based on the fitness function
 # then create a new generation from the kept clusters
 # stop when there is no improvement from the old gen to the new gen
-while(1):
+for i in xrnage(len(num_trials))
 	clusters = ca.do_cluster_algorithm(num_clusters, old_gen)
-	new_gen = ga.do_genetic_algorithm(clusters, ff.do_fitness_function, old_gen)
+	soltuions = ga.do_genetic_algorithm(clusters, ff.do_fitness_function, old_gen)
