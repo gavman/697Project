@@ -7,18 +7,24 @@
 def do_cluster_algorithm(num_clusters, results, cluster_range):
   # run k-means with the desired number of clusters
   min_error = kMeans(results, num_clusters);
-  min_clusters = num_clusters;
+  opt_clusters = num_clusters;
 
-  # run
+  # run k-means for range of number of clusters
   for i in range(1, cluster_range):
-    fitness = kMeans(results, num_clusters + i);
+    error = kMeans(results, num_clusters + i);
+    if (error < min_error):
+      min_error = error;
+      opt_clusters = num_clusters + i;
     
     tmp_num = num_clusters - 1;
     if (tmp_num <= 0):
-      continue;
-    fitness = kMeans(results, num_clusters - i);
+      pass;
+    error = kMeans(results, num_clusters - i);
+    if (error < min_error):
+      min_error = error;
+      opt_clusters = num_clusters - i;
     
-  return
+  return opt_clusters
 
 
 #function distance_measure
