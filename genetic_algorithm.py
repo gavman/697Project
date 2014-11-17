@@ -13,7 +13,7 @@ from random import sample
 def do_genetic_algorithm(phi, old_gen):
     
     #load in the list of all words in all titles
-    words = pd.Series.from_csv('all_words.csv')
+    words = pd.Series.from_csv('data/all_words.csv')
     
     #how is the current list of words fairing?
     current_pct = naive_bayes(list(old_gen.values)
@@ -59,7 +59,7 @@ def naive_bayes(words):
     topic_max = 2
 
     #TODO split into training and testing
-    data = pd.DataFrame.from_csv('titles_nice.csv')
+    data = pd.DataFrame.from_csv('data/titles_nice.csv')
     training_set = data
     testing_set = data
 

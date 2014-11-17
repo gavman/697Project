@@ -2,7 +2,6 @@
 import csv
 ga = __import__(args.genetic_algorithm)
 ca = __import__(args.cluster_algorithm)
-ff = __import__(args.fitness_function)
 
 def readData(filename):
     data = [];
@@ -61,7 +60,7 @@ def main():
 
         # Run Genetic Algorithm X times
         for j in range(1,numTrials):
-            solution = ga.do_genetic_algorithm(phi, ff.do_fitness_function, old_gen);
+            solution = ga.do_genetic_algorithm(phi, old_gen);
             optima.append(solution);
 
         # Run Generalized Crowding on solution set
