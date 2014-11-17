@@ -4,15 +4,41 @@ import pandas as pd
 import numpy as np
 import string
 import copy
+from random import sample
 
 #function do_genetic_algorithm
     #takes a scaling factor which is the exploration/exploitation trade-off
 	#takes the current generation as input 2
 	#returns a new generation of data
 def do_genetic_algorithm(phi, old_gen):
-    return
+    
+    #load in the list of all words in all titles
+    words = pd.Series.from_csv('all_words.csv')
+    
+    #how is the current list of words fairing?
+    current_pct = naive_bayes(list(old_gen.values)
+    #for each index, replace the word if the newly selected random word fares better
+    for i in xrange(len(old_gen)):
+        new_word = old_gen.values[0]
+        # look for a new random word not already in our list
+        while (new_word not in old_gen.values()):
+            new_word = words.ix[np.array(sample(xrange(len(words)), 1))]
+        
+        #make a copy of our list, insert the new random word
+        old_gen_copy = old_gen.copy()
+        old_gen_copy[i] = new_word
+        #how does the copy with the new word do in naive bayes?
+        pct = naive_bayes(list(old_gen_copy))
+        #if it fares better, use the new list of random words
+        if (pct > current_pct):
+            old_gen = old_gen_copy
+            current_pct = pct
 
-#test set of words for naive_bayes, has 80% accuracy
+    #return the list remaining at the end
+    return old_gen_copy
+
+
+#example set of words for naive bayes with 80% accuracy
 """
 words = list()
 words.append('politics')
