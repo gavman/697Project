@@ -74,4 +74,4 @@ def naive_bayes(words):
         if testing_set.Topic.values[i] == guess:
             num_correct += 1
 
-print float(num_correct)/testing_set.Title.count()
+    return float(num_correct)/testing_set.Title.count()
