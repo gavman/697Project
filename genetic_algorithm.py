@@ -38,20 +38,6 @@ def do_genetic_algorithm(phi, old_gen):
     return old_gen_copy
 
 
-#example set of words for naive bayes with 80% accuracy
-"""
-words = list()
-words.append('politics')
-words.append('president')
-words.append('gop')
-words.append('democrat')
-words.append('republicans')
-words.append('war')
-words.append('bush')
-words.append('iraq')
-"""
-
-
 #words is a python list of key words
 def naive_bayes(words):
     #topics

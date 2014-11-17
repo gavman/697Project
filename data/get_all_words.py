@@ -32,11 +32,11 @@ data['Topic'] = data['War on Terror'] * 1 + \
 data = data[['Title', 'Topic']]
 data = data[data['Topic'] > 0].reset_index(drop=True)
 
-"""
-for i in xrange(10):
-    this_data = data[data['Topic'] == i+1]
-    print i+1, len(this_data) 
-"""
+
+#for i in xrange(10):
+#    this_data = data[data['Topic'] == i+1]
+#    print i+1, len(this_data) 
+
 # We see the number of articles per topic is:
 # War on Terror: 4170
 # Katrina: 162
@@ -75,3 +75,16 @@ for title in titles:
         all_words.add(word.lower())
 word_series = pd.Series(list(all_words))
 word_series[1:].to_csv('all_words.csv')
+
+#example set of words for naive bayes with 80% accuracy
+words = list()
+words.append('politics')
+words.append('president')
+words.append('gop')
+words.append('democrat')
+words.append('republicans')
+words.append('war')
+words.append('bush')
+words.append('iraq')
+first_gen = pd.Series(words)
+first_gen.to_csv('first_gen.csv')
