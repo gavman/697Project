@@ -43,12 +43,16 @@ def naive_bayes(words):
     #topics
     topic_min = 1
     topic_max = 2
-
-    #TODO split into training and testing
+    training_pct = .7
+    
+    #get data
     data = pd.DataFrame.from_csv('data/titles_nice.csv')
-    training_set = data
-    testing_set = data
-
+    #split into training and testing sets
+    num_training_indexes = int(training_pct*len(data))
+    sampled_indexes = sample(xrange(len(data)), num_training_indexes)
+    other_indexes = [x for x in xrange(len(data)) not in sampled_indexes]
+    training_set = data.ix[np.array(sampled_indexes)]
+    testing_set = data.ix[np.array(other_indexes)]
 
     priors = list()
     mu = pd.DataFrame([])
@@ -69,7 +73,11 @@ def naive_bayes(words):
         for topic in xrange(topic_min, topic_max+1):
             word_count = float(word_titles[training_set.Topic == topic].Title.count())
             word_count_all = word_titles.Title.count()
-            this_word_probs.append(word_count/word_count_all)
+            if (word_count_all != 0):
+                this_word_probs.append(word_count/word_count_all)
+            else:
+                #word never appreas in any topic, 1 for no change to prob
+                this_word_probs.append(1.0)
         word_probs[word] = this_word_probs
 
     #test
