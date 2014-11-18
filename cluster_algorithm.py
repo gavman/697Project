@@ -9,8 +9,8 @@ import random
 	#takes generation of data as input 2
 	#returns the clusters that get passed into the genetic algorithm
 def do_cluster_algorithm(num_clusters, results, cluster_range):
-  #TODO: results is a data frame where each column is a basket of words, create a data frame to cluster on
-  
+  results = create_kmean_data_frame(results)
+
   # run k-means with the desired number of clusters
   min_error = kmeans(results, num_clusters);
   opt_clusters = num_clusters;
@@ -32,11 +32,24 @@ def do_cluster_algorithm(num_clusters, results, cluster_range):
     
   return opt_clusters
 
+#function create_kmean_data_frame
+    #takes the data frame where each basket is a column as input 1
+    #returns a data frame that kmeans can be used on
+def create_kmean_data_frame(results):
+  a = pd.DataFrame([])
+  #here we just take the mean and stdev of word len
+  for column in results.columns:
+      data_column = results[column]
+      data_column_str_len = data[column].str.len()
+      b = list()
+      b.append(data_column_str_len.mean())
+      b.append(data_column_str_len.stdev())
+      a[len(a.columns)] = b
+  return a
 
 #function kmeans
     #takes the data as input 1
     #takes the number of means as input 2
-
 #data is a data frame where each column is a vector of data at one data point
 def kmeans(data, num_means):
     data.reset_index(drop=True, inplace=True)
