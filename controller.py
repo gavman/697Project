@@ -11,9 +11,6 @@ ga = __import__(args.genetic_algorithm)
 ca = __import__(args.cluster_algorithm)
 
 def main():
-    # Read in dataset from csv file
-    data = pd.Series.from_csv('data/first_gen.csv');
-    
     k = 2
     actK = 0
 
@@ -57,13 +54,18 @@ def main():
         phi = phi + pGain*err + iGain*sumErr + dGain*dErr
         print "phi = ", phi
 
+        new_gen = pd.DataFrame()
+        scores = pd.DataFrame()
         # Run Genetic Algorithm X times
         for j in xrange(numTrials):
-            solution = ga.do_genetic_algorithm(phi, data)
-            optima[len(optima.columns)] = solution
+            #TODO: write this function
+            data = generate_new_random_data()
+            (new_gen_vector, scoring) = ga.do_genetic_algorithm(phi, data)
+            scores[len(scores.columns)] = scoring
+            new_gen[len(new_gen.columns)] = new_gen_vector
 
         # Run Generalized Crowding on solution set
-        actK = ca.do_cluster_algorithm(k, optima, cluster_range)
+        actK = ca.do_cluster_algorithm(k, scores, cluster_range)
 
 if __name__ == '__main__':
     main()

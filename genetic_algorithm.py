@@ -4,13 +4,44 @@ import pandas as pd
 import numpy as np
 import string
 import copy
-from random import sample
+from random import sample, random
 
-#function do_genetic_algorithm
+def do_genetic_algorithm(sets, phi):
+    
+    while(len(sets.columns) > 1):
+        pcts = list()
+        results = list()
+        for column in sets.columns():
+            this_set = sets[column]
+            (pct, results) = naive_bayes(this_set)
+            pcts.append(pct)
+            results.append(result)
+
+        #find smallest index of two smallest pcts
+        min_index = pcts.index(min(pcts))
+        pcts[min_index] = max(pcts)
+        min_index_two = pcts.index(min(pcts))
+        to_delete = min_index
+        if (phi > 0 and random.random() > .5):
+            to_delete = min_index_two
+        
+        del sets[sets.columns[to_delete]]
+
+        #mutate each set
+        for column in sets.columns():
+            this_set = sets[column]
+            new_set = mutate(this_set)
+            sets[column] = new_set
+    
+    #return the one column
+    to_return = sets[sets.columns[0]]
+    return to_return, naive_bayes(to_return)[1]
+
+#function mutate
     #takes a scaling factor which is the exploration/exploitation trade-off
 	#takes the current generation as input 2
 	#returns a new generation of data
-def do_genetic_algorithm(phi, old_gen):
+def mutate(old_gen):
     
     #load in the list of all words in all titles
     words = pd.Series.from_csv('data/all_words.csv')
@@ -37,7 +68,7 @@ def do_genetic_algorithm(phi, old_gen):
             results = new_results
 
     #return the list remaining at the end
-    return results
+    return old_gen
 
 
 #words is a python list of key words

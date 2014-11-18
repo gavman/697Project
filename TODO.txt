@@ -1,0 +1,8 @@
+TODO
+
+1) create cost function for objective clustering
+2) write generate new random data function --gavi
+3) clean up k means
+4) split into testing/training set --gavi
+5) merge clusters
+6) minimize file io --gavi
