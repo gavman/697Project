@@ -19,7 +19,7 @@ def main():
 
     # Generating new word sets
     all_words = pd.Series.from_csv('data/all_words.csv')
-    num_sets = 15
+    num_sets = 5
     words_per_set = 10
 
     # Controller Constants
@@ -66,7 +66,7 @@ def main():
         scores = pd.DataFrame()
         # Run Genetic Algorithm X times
         for j in xrange(numTrials):
-            data = generate_new_random_data(num_sets, words_per_set, all_words))
+            data = generate_new_random_word_sets(num_sets, words_per_set, all_words)
             (new_gen_vector, scoring) = ga.do_genetic_algorithm(phi, data)
             scores[len(scores.columns)] = scoring
             new_gen[len(new_gen.columns)] = new_gen_vector
@@ -78,7 +78,7 @@ def generate_new_random_word_sets(num_sets, words_per_set, all_words):
     word_sets = pd.DataFrame()
     for i in xrange(num_sets):
         sample_indexes = sample(xrange(len(all_words)), words_per_set)
-        word_sets[len(word_sets.columns)] = all_words[sample_indexes]
+        word_sets[len(word_sets.columns)] = all_words[sample_indexes].reset_index(drop=True)
     return word_sets
 
 if __name__ == '__main__':

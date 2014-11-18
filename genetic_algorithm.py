@@ -4,21 +4,21 @@ import pandas as pd
 import numpy as np
 import string
 import copy
-from random import sample, random
+import random
 
-def do_genetic_algorithm(sets, phi):
+def do_genetic_algorithm(phi, sets):
     
     #some file io to pass around
-    training_set = pd.DataFrame.from_csv('training_set.csv')
-    testing_set = pd.DataFrame.from_csv('testing_set.csv')
-    words = pd.Series.from_csv('data/all_words.csv')
+    training_set = pd.DataFrame.from_csv('data/training_set.csv')
+    testing_set = pd.DataFrame.from_csv('data/testing_set.csv')
+    all_words = pd.Series.from_csv('data/all_words.csv')
 
     while(len(sets.columns) > 1):
         pcts = list()
         results = list()
-        for column in sets.columns():
+        for column in sets.columns:
             this_set = sets[column]
-            (pct, results) = naive_bayes(this_set, training_set, testing_set)
+            (pct, result) = naive_bayes(this_set, training_set, testing_set)
             pcts.append(pct)
             results.append(result)
 
@@ -33,7 +33,7 @@ def do_genetic_algorithm(sets, phi):
         del sets[sets.columns[to_delete]]
 
         #mutate each set
-        for column in sets.columns():
+        for column in sets.columns:
             this_set = sets[column]
             new_set = mutate(this_set, all_words, training_set, testing_set)
             sets[column] = new_set
