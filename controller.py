@@ -24,7 +24,7 @@ def main():
     dGain = 0.0
     err = 0
     dErr = 0
-    errLast = 0
+    errLast = -1
     sumErr = 0
     errMax = 5
     errMin = -2

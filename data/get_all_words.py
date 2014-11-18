@@ -2,7 +2,7 @@
 
 import pandas as pd
 import string
-
+"""
 #filter the data
 data = pd.DataFrame.from_csv('data.csv')
 data = data[[
@@ -55,7 +55,7 @@ data.Topic = data.Topic.replace('5', '2')
 data.reset_index(drop=True, inplace=True)
 
 pd.DataFrame.to_csv(data, 'data_filtered.csv')
-
+"""
 # make the titles nice
 exclude = set(string.punctuation)
 exclude.add('\n')
@@ -70,11 +70,11 @@ titles.to_csv('titles_nice.csv')
 
 # get all the words that appear
 all_words = set()
-for title in titles:
+for title in titles.Title:
     for word in title.split(' '):
         all_words.add(word.lower())
 word_series = pd.Series(list(all_words))
-word_series[1:].to_csv('all_words.csv')
+word_series.to_csv('all_words.csv')
 
 #example set of words for naive bayes with 80% accuracy
 words = list()
