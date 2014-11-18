@@ -3,10 +3,10 @@
 import argparse
 parser = argparse.ArgumentParser(description='Framework for 18-697 project')
 parser.add_argument('-ga', '--genetic-algorithm', help='location of the genetic algorithm function', required=True)
-parser.add_argument('-ca', '--cluster-agorithm', help='location of the cluster algorithm function', required=True)
+parser.add_argument('-ca', '--cluster-algorithm', help='location of the cluster algorithm function', required=True)
 args = parser.parse_args()
 
-import pandas
+import pandas as pd
 ga = __import__(args.genetic_algorithm)
 ca = __import__(args.cluster_algorithm)
 
@@ -14,7 +14,7 @@ def main():
     # Read in dataset from csv file
     data = pd.Series.from_csv('data/first_gen.csv');
     
-    k = 3
+    k = 2
     actK = 0
 
     # Controller Constants
@@ -30,16 +30,16 @@ def main():
     errMin = -2
 
     #cluster range
-    cluster_range = 5
+    cluster_range = 1
 
     # Genetic Algorithm Constants
-    numTrials = 100
+    numTrials = 4
     optima = pd.DataFrame();
 
     # Generalized Crowding Constants
     #fitFunc;
 
-    for i in range(1, 1000):
+    for i in xrange(15):
         # Proportional Term
         err = (k - actK)
 
@@ -55,10 +55,11 @@ def main():
             sumErr = errMin
 
         phi = phi + pGain*err + iGain*sumErr + dGain*dErr
+        print "phi = ", phi
 
         # Run Genetic Algorithm X times
-        for j in range(1,numTrials):
-            solution = ga.do_genetic_algorithm(phi, old_gen)
+        for j in xrange(numTrials):
+            solution = ga.do_genetic_algorithm(phi, data)
             optima[len(optima.columns)] = solution
 
         # Run Generalized Crowding on solution set

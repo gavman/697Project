@@ -9,15 +9,17 @@ import random
 	#takes generation of data as input 2
 	#returns the clusters that get passed into the genetic algorithm
 def do_cluster_algorithm(num_clusters, results, cluster_range):
-  results = create_kmean_data_frame(results)
+  #results = create_kmean_data_frame(results)
 
   # run k-means with the desired number of clusters
   min_error = kmeans(results, num_clusters);
+  print num_clusters, " error = ", min_error
   opt_clusters = num_clusters;
 
   # run k-means for range of number of clusters
-  for i in xrange(1, cluster_range):
+  for i in xrange(1, cluster_range + 1):
     error = kmeans(results, num_clusters + i);
+    print (num_clusters + i), " error = ", error
     if (error < min_error):
       min_error = error;
       opt_clusters = num_clusters + i;
@@ -25,27 +27,14 @@ def do_cluster_algorithm(num_clusters, results, cluster_range):
     tmp_num = num_clusters - 1;
     if (tmp_num <= 0):
       pass;
+
     error = kmeans(results, num_clusters - i);
+    print (num_clusters - i), " error = ", error
     if (error < min_error):
       min_error = error;
       opt_clusters = num_clusters - i;
     
   return opt_clusters
-
-#function create_kmean_data_frame
-    #takes the data frame where each basket is a column as input 1
-    #returns a data frame that kmeans can be used on
-def create_kmean_data_frame(results):
-  a = pd.DataFrame([])
-  #here we just take the mean and stdev of word len
-  for column in results.columns:
-      data_column = results[column]
-      data_column_str_len = data[column].str.len()
-      b = list()
-      b.append(data_column_str_len.mean())
-      b.append(data_column_str_len.stdev())
-      a[len(a.columns)] = b
-  return a
 
 #function kmeans
     #takes the data as input 1
@@ -57,6 +46,7 @@ def kmeans(data, num_means):
     maxes = data.max(axis = 1)
     mins = data.min(axis = 1)
 
+    #means: each column is a n-dimensional mean
     #create random initial means
     means = pd.DataFrame(np.zeros((num_rows, num_means)))
     for mean in xrange(num_means):
@@ -70,7 +60,9 @@ def kmeans(data, num_means):
     while (not means.equals(old_means)):
         old_means = means.copy()
         clusters = pd.Series(-1, np.arange(num_rows))
-        for cluster_name in data.columns:
+        #find 
+        for i in xrange(len(data.columns)):
+            cluster_name = data.columns[i]
             cluster = data[cluster_name]
             shortest_dis = -1
             for mean in means.columns:
@@ -78,12 +70,14 @@ def kmeans(data, num_means):
                 if (shortest_dis == -1 or dis < shortest_dis):
                     shortest_dis = dis
                     clusters[cluster_name] = mean
+        
         for mean in means.columns:
             num_columns = 0
             this_cluster = pd.DataFrame()
-            for cluster in clusters:
+            for i in xrange(len(clusters)):
+                cluster = clusters[i]
                 if cluster == mean:
-                    this_cluster[num_columns] = data[cluster]
+                    this_cluster[len(this_cluster.columns)] = data[i]
                     num_columns += 1
             means[mean] = this_cluster.mean(axis=1)
     
@@ -93,4 +87,4 @@ def kmeans(data, num_means):
         mean = means[clusters[data_point]]
         error += np.linalg.norm(data[data_point].sub(mean, axis=0))
 
-    return error
+    return error/len(data.columns)

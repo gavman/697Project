@@ -16,26 +16,27 @@ def do_genetic_algorithm(phi, old_gen):
     words = pd.Series.from_csv('data/all_words.csv')
     
     #how is the current list of words fairing?
-    current_pct = naive_bayes(list(old_gen.values)
+    (current_pct, results) = naive_bayes(list(old_gen.values))
     #for each index, replace the word if the newly selected random word fares better
     for i in xrange(len(old_gen)):
         new_word = old_gen.values[0]
         # look for a new random word not already in our list
-        while (new_word not in old_gen.values()):
+        while (new_word not in old_gen.values):
             new_word = words.ix[np.array(sample(xrange(len(words)), 1))]
         
         #make a copy of our list, insert the new random word
         old_gen_copy = old_gen.copy()
         old_gen_copy[i] = new_word
         #how does the copy with the new word do in naive bayes?
-        pct = naive_bayes(list(old_gen_copy))
+        (pct, new_results) = naive_bayes(list(old_gen_copy))
         #if it fares better, use the new list of random words
         if (pct > current_pct):
             old_gen = old_gen_copy
             current_pct = pct
+            results = new_results
 
     #return the list remaining at the end
-    return old_gen_copy
+    return results
 
 
 #words is a python list of key words
@@ -50,13 +51,11 @@ def naive_bayes(words):
     #split into training and testing sets
     num_training_indexes = int(training_pct*len(data))
     sampled_indexes = sample(xrange(len(data)), num_training_indexes)
-    other_indexes = [x for x in xrange(len(data)) not in sampled_indexes]
+    other_indexes = [x for x in xrange(len(data)) if x not in sampled_indexes]
     training_set = data.ix[np.array(sampled_indexes)]
     testing_set = data.ix[np.array(other_indexes)]
 
     priors = list()
-    mu = pd.DataFrame([])
-    sigma = pd.DataFrame([])
 
     total_count = training_set.Topic.count()
     for yk in xrange(topic_min, topic_max+1):
@@ -81,7 +80,10 @@ def naive_bayes(words):
         word_probs[word] = this_word_probs
 
     #test
-    num_correct = 0
+    tp = 0
+    tn = 0
+    fp = 0
+    fn = 0
     for i in xrange(testing_set.Title.count()):
         title = testing_set.Title.values[i]
         probs = copy.copy(priors)
@@ -91,7 +93,18 @@ def naive_bayes(words):
                 probs[topic-topic_min] *= word_probs.get(found_word)[topic-topic_min]
         #pick the topic with the greatest probability
         guess = probs.index(max(probs)) + topic_min
-        if testing_set.Topic.values[i] == guess:
-            num_correct += 1
-
-    return float(num_correct)/testing_set.Title.count()
+        actual_answer = training_set.Topic.values[i]
+        if guess == 1 and actual_answer == 1:
+            tp += 1
+        elif guess == 1 and actual_answer == 2:
+            fp += 1
+        elif guess == 2 and actual_answer == 2:
+            tn += 1
+        else:
+            fn += 1
+    results = list()
+    results.append(tp)
+    results.append(fp)
+    results.append(tn)
+    results.append(fn)
+    return (float(tp+tn)/testing_set.Title.count(), pd.Series(results))
