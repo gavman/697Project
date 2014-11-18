@@ -7,12 +7,20 @@ parser.add_argument('-ca', '--cluster-algorithm', help='location of the cluster 
 args = parser.parse_args()
 
 import pandas as pd
+import numpy as np
+from random import sample
+
 ga = __import__(args.genetic_algorithm)
 ca = __import__(args.cluster_algorithm)
 
 def main():
     k = 2
     actK = 0
+
+    # Generating new word sets
+    all_words = pd.Series.from_csv('data/all_words.csv')
+    num_sets = 15
+    words_per_set = 10
 
     # Controller Constants
     phi = 1.0
@@ -58,14 +66,20 @@ def main():
         scores = pd.DataFrame()
         # Run Genetic Algorithm X times
         for j in xrange(numTrials):
-            #TODO: write this function
-            data = generate_new_random_data()
+            data = generate_new_random_data(num_sets, words_per_set, all_words))
             (new_gen_vector, scoring) = ga.do_genetic_algorithm(phi, data)
             scores[len(scores.columns)] = scoring
             new_gen[len(new_gen.columns)] = new_gen_vector
 
         # Run Generalized Crowding on solution set
         actK = ca.do_cluster_algorithm(k, scores, cluster_range)
+
+def generate_new_random_word_sets(num_sets, words_per_set, all_words):
+    word_sets = pd.DataFrame()
+    for i in xrange(num_sets):
+        sample_indexes = sample(xrange(len(all_words)), words_per_set)
+        word_sets[len(word_sets.columns)] = all_words[sample_indexes]
+    return word_sets
 
 if __name__ == '__main__':
     main()

@@ -1,7 +1,9 @@
 #/bin/env python
 
 import pandas as pd
+import numpy as np
 import string
+from random import sample
 """
 #filter the data
 data = pd.DataFrame.from_csv('data.csv')
@@ -55,7 +57,7 @@ data.Topic = data.Topic.replace('5', '2')
 data.reset_index(drop=True, inplace=True)
 
 pd.DataFrame.to_csv(data, 'data_filtered.csv')
-"""
+
 # make the titles nice
 exclude = set(string.punctuation)
 exclude.add('\n')
@@ -67,29 +69,25 @@ for title in titles.Title:
 
 titles['Title'] = new_titles.values
 titles.to_csv('titles_nice.csv')
+"""
 
-# get all the words that appear
+
+#get data
+data = pd.DataFrame.from_csv('titles_nice.csv')
+#split into training and testing sets
+training_pct = .7
+num_training_indexes = int(training_pct*len(data))
+sampled_indexes = sample(xrange(len(data)), num_training_indexes)
+other_indexes = [x for x in xrange(len(data)) if x not in sampled_indexes]
+training_set = data.ix[np.array(sampled_indexes)]
+testing_set = data.ix[np.array(other_indexes)]
+
+training_set.to_csv('training_set.csv')
+testing_set.to_csv('testing_set.csv')
+
 all_words = set()
-for title in titles.Title:
+for title in training_set.Title:
     for word in title.split(' '):
         all_words.add(word.lower())
 word_series = pd.Series(list(all_words))
 word_series.to_csv('all_words.csv')
-
-#example set of words for naive bayes with 80% accuracy
-words = list()
-words.append('politics')
-words.append('president')
-words.append('gop')
-words.append('democrat')
-words.append('republicans')
-words.append('war')
-words.append('bush')
-words.append('iraq')
-words.append('in')
-words.append('the')
-words.append('presidential')
-words.append('afghanistan')
-words.append('terror')
-first_gen = pd.Series(words)
-first_gen.to_csv('first_gen.csv')

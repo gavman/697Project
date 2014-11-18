@@ -8,12 +8,17 @@ from random import sample, random
 
 def do_genetic_algorithm(sets, phi):
     
+    #some file io to pass around
+    training_set = pd.DataFrame.from_csv('training_set.csv')
+    testing_set = pd.DataFrame.from_csv('testing_set.csv')
+    words = pd.Series.from_csv('data/all_words.csv')
+
     while(len(sets.columns) > 1):
         pcts = list()
         results = list()
         for column in sets.columns():
             this_set = sets[column]
-            (pct, results) = naive_bayes(this_set)
+            (pct, results) = naive_bayes(this_set, training_set, testing_set)
             pcts.append(pct)
             results.append(result)
 
@@ -30,24 +35,21 @@ def do_genetic_algorithm(sets, phi):
         #mutate each set
         for column in sets.columns():
             this_set = sets[column]
-            new_set = mutate(this_set)
+            new_set = mutate(this_set, all_words, training_set, testing_set)
             sets[column] = new_set
     
     #return the one column
     to_return = sets[sets.columns[0]]
-    return to_return, naive_bayes(to_return)[1]
+    return to_return, naive_bayes(to_return, training_set, testing_set)[1]
 
 #function mutate
     #takes a scaling factor which is the exploration/exploitation trade-off
 	#takes the current generation as input 2
 	#returns a new generation of data
-def mutate(old_gen):
-    
-    #load in the list of all words in all titles
-    words = pd.Series.from_csv('data/all_words.csv')
+def mutate(old_gen, all_words, training_set, testing_set):
     
     #how is the current list of words fairing?
-    (current_pct, results) = naive_bayes(list(old_gen.values))
+    (current_pct, results) = naive_bayes(list(old_gen.values), training_set, testing_set)
     
     #for each index, replace the word if the newly selected random word fares better
     for i in xrange(len(old_gen)):
@@ -60,7 +62,7 @@ def mutate(old_gen):
         old_gen_copy = old_gen.copy()
         old_gen_copy[i] = new_word
         #how does the copy with the new word do in naive bayes?
-        (pct, new_results) = naive_bayes(list(old_gen_copy))
+        (pct, new_results) = naive_bayes(old_gen_copy, training_set, testing_set)
         #if it fares better, use the new list of random words
         if (pct > current_pct):
             old_gen = old_gen_copy
@@ -72,21 +74,11 @@ def mutate(old_gen):
 
 
 #words is a python list of key words
-def naive_bayes(words):
+def naive_bayes(words, training_set, testing_set):
     #topics
     topic_min = 1
     topic_max = 2
-    training_pct = .7
     
-    #get data
-    data = pd.DataFrame.from_csv('data/titles_nice.csv')
-    #split into training and testing sets
-    num_training_indexes = int(training_pct*len(data))
-    sampled_indexes = sample(xrange(len(data)), num_training_indexes)
-    other_indexes = [x for x in xrange(len(data)) if x not in sampled_indexes]
-    training_set = data.ix[np.array(sampled_indexes)]
-    testing_set = data.ix[np.array(other_indexes)]
-
     priors = list()
     total_count = training_set.Topic.count()
     for yk in xrange(topic_min, topic_max+1):
