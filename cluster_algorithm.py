@@ -87,6 +87,6 @@ def kmeans(data, num_means):
         # Compute new means for next iteration
         for mean in means.columns:
             if (new_means[mean].ix[num_rows] != 0):
-                new_means[mean] = new_means[mean] / new_means[means].ix[num_rows]
+                new_means[mean] = new_means[mean] / new_means[mean].ix[num_rows]
 
     return error/len(data.columns)
