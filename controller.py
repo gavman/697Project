@@ -74,7 +74,7 @@ def main():
         # Run Generalized Crowding on solution set
         actK = ca.do_cluster_algorithm(k, scores, cluster_range)
 
-        new_gen.to_csv('gens/new_gen_' + str(i))
+        new_gen.to_csv('gens/new_gen_' + str(i) + '.csv')
 
 def generate_new_random_word_sets(num_sets, words_per_set, all_words):
     word_sets = pd.DataFrame()
