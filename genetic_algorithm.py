@@ -48,9 +48,6 @@ def do_genetic_algorithm(phi, sets):
 	#returns a new generation of data
 def mutate(old_gen, all_words, training_set, testing_set):
     
-    #how is the current list of words fairing?
-    (current_pct, results) = naive_bayes(list(old_gen.values), training_set, testing_set)
-    
     #for each index, replace the word if the newly selected random word fares better
     for i in xrange(len(old_gen)):
         new_word = old_gen.values[0]
@@ -62,12 +59,9 @@ def mutate(old_gen, all_words, training_set, testing_set):
         old_gen_copy = old_gen.copy()
         old_gen_copy[i] = new_word
         #how does the copy with the new word do in naive bayes?
-        (pct, new_results) = naive_bayes(old_gen_copy, training_set, testing_set)
         #if it fares better, use the new list of random words
-        if (pct > current_pct):
+        if (random.random() > .75):
             old_gen = old_gen_copy
-            current_pct = pct
-            results = new_results
 
     #return the list remaining at the end
     return old_gen
