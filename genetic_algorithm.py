@@ -84,17 +84,22 @@ def naive_bayes(words, training_set, testing_set):
     #train
     word_probs = dict() #maps word to list of probs for each topic
     for word in words:
-        word_titles = training_set[training_set.Title.str.contains(word)]
-        this_word_probs = list()
-        word_count_all = word_titles.Title.count()
-        for topic in xrange(topic_min, topic_max+1):
-            word_count = float(word_titles[training_set.Topic == topic].Title.count())
-            if (word_count_all != 0):
-                this_word_probs.append(word_count/word_count_all)
-            else:
-                #word never appreas in any topic, 1 for no change to prob
-                this_word_probs.append(1.0)
-        word_probs[word] = this_word_probs
+        try:
+            word_titles = training_set[training_set.Title.str.contains(word)]
+            this_word_probs = list()
+            word_count_all = word_titles.Title.count()
+            for topic in xrange(topic_min, topic_max+1):
+                word_count = float(word_titles[training_set.Topic == topic].Title.count())
+                if (word_count_all != 0):
+                    this_word_probs.append(word_count/word_count_all)
+                else:
+                    #word never appreas in any topic, 1 for no change to prob
+                    this_word_probs.append(1.0)
+            word_probs[word] = this_word_probs
+        except:
+            word_probs[word] = list()
+            word_probs[word].append(1.)
+            word_probs[word].append(1.)
 
     #test
     tp = 0
