@@ -20,7 +20,7 @@ def main():
     # Generating new word sets
     all_words = pd.Series.from_csv('data/all_words.csv')
     num_sets = 5
-    words_per_set = 10
+    words_per_set = 5
 
     # Controller Constants
     phi = 1.0
@@ -38,13 +38,13 @@ def main():
     cluster_range = 1
 
     # Genetic Algorithm Constants
-    numTrials = 4
+    numTrials = 15
     optima = pd.DataFrame();
 
     # Generalized Crowding Constants
     #fitFunc;
 
-    for i in xrange(15):
+    for i in xrange(50):
         # Proportional Term
         err = (k - actK)
 
@@ -68,13 +68,16 @@ def main():
         for j in xrange(numTrials):
             data = generate_new_random_word_sets(num_sets, words_per_set, all_words)
             (new_gen_vector, scoring) = ga.do_genetic_algorithm(phi, data)
-            scores[len(scores.columns)] = scoring
+            scores[len(scores.columns)] = scoring[1]
             new_gen[len(new_gen.columns)] = new_gen_vector
 
         # Run Generalized Crowding on solution set
         actK = ca.do_cluster_algorithm(k, scores, cluster_range)
 
         new_gen.to_csv('gens/new_gen_' + str(i) + '.csv')
+
+        #TODO: run the test set again through naive bayes, but using all the
+        #word sets instead of just one
 
 def generate_new_random_word_sets(num_sets, words_per_set, all_words):
     word_sets = pd.DataFrame()
