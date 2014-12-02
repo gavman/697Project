@@ -52,8 +52,9 @@ def mutate(old_gen, all_words, training_set, testing_set):
     for i in xrange(len(old_gen)):
         new_word = old_gen.values[0]
         # look for a new random word not already in our list
-        while (new_word not in old_gen.values):
-            new_word = words.ix[np.array(sample(xrange(len(words)), 1))]
+        while (new_word in old_gen.values):
+            new_word = all_words.ix[np.array(random.sample( \
+                    xrange(len(all_words)),1))].reset_index()[0][0]
         
         #make a copy of our list, insert the new random word
         old_gen_copy = old_gen.copy()
@@ -65,7 +66,6 @@ def mutate(old_gen, all_words, training_set, testing_set):
 
     #return the list remaining at the end
     return old_gen
-
 
 #words is a python list of key words
 def naive_bayes(words, training_set, testing_set):
