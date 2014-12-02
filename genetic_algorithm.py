@@ -53,8 +53,8 @@ def mutate(old_gen, all_words, training_set, testing_set):
         new_word = old_gen.values[0]
         # look for a new random word not already in our list
         while (new_word in old_gen.values):
-            new_word = all_words.ix[np.array(random.sample( \
-                    xrange(len(all_words)),1))].reset_index()[0][0]
+            new_word = str(all_words.ix[np.array(random.sample( \
+                    xrange(len(all_words)),1))].reset_index()[0][0])
         
         #make a copy of our list, insert the new random word
         old_gen_copy = old_gen.copy()
@@ -110,7 +110,7 @@ def naive_bayes(words, training_set, testing_set):
         title = testing_set.Title.values[i]
         probs = copy.copy(priors)
         #multiply the priors by likelihood of topic given each word in our set
-        for found_word in [word for word in words if word in title]:
+        for found_word in [word for word in words if str(word) in title]:
             for topic in xrange(topic_min, topic_max+1):
                 probs[topic-topic_min] *= word_probs.get(found_word)[topic-topic_min]
         #pick the topic with the greatest probability
