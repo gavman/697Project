@@ -46,7 +46,7 @@ Our Abstract
 \section{Introduction}
 Our Intro
 
-\section{Background}
+\section{Background and Previous Work}
 Background
 
 \section{Method}
@@ -57,8 +57,8 @@ Background
 \caption{The Algorithm Pipeline}
 \label{fig:pipeline}
 \end{figure*}
-\subsection{The Pipeline}
-Our pipeline, as seen in Figure~\ref{fig:pipeline}, consists of a few independent pieces put together in a control loop.
+\subsection{Pipeline Overview}
+Our pipeline, as seen in Figure~\ref{fig:pipeline}, consists of a few independent pieces put together in a control loop. To initialize the pipeline, we first separated the titles into a training and a testing set. We then made a list of words that appear in the titles of the training set and filtered the data set into our feature sets, or sets of bags of words from that list. In the control loop, we get our error value from the difference between the optimal number of clusters returned by the objective K-Means function and the desired number of clusters. The error and the PID controller created a $\phi$ term representing exploration vs. exploitation. We generated sets of bags of words from the training set list and passed each into the genetic algorithm along with the $\phi$ term, and each returned a locally optimal bag of words. These optimal bags were clustered to find the optimal number of clusters, and the loop restarts. Each section of the algorithm is discussed in detail below.
 
 \subsection{Genetic Algorithm}
 \begin{figure}[t]
@@ -68,8 +68,13 @@ Our pipeline, as seen in Figure~\ref{fig:pipeline}, consists of a few independen
 \caption{The flow of one iteration of the genetic algorithm}
 \label{fig:genetic_algo}
 \end{figure}
+Our genetic algorithm operated on a set of bags of words, and converged to a single locally optimal bag of words. At each round of the genetic algorithm, the Naive Bayes score on the testing set was calculated for each bag of words. The lowest two scores competed for survival, and the victor was based on both the $\phi$ exploration/exploitation term and a random coin flip. After one bag was killed, each remaining bag was mutated and additional randomized cross-over between trials was added in to further diversity. Our solution set was created by running several trials of the genetic algorithm on many randomly generated sets of bags of words.\\
+\indent In the mutation step, the algorithm attempted to replace each word in the bag of words with a new word taken from the titles in the training set. If the Naive Bayes score of the bag of words with the new word was higher than it was with the old word, the new word replaced the old word, otherwise the new word was discarded.\\
+\indent In our genetic algorithm, we did not follow CITEPAPERHERE and user Hamiltonian Distance in the clustering algorithm, instead we decided to try something different and creative and used Naive Bayes results. We passed the number of true positives, true negatives, false positives, and false negatives to the clustering algorithm, hoping this would create diverse results with some bags of words strong in each case. In the end we found this approach did not fare well and the results converged to a single cluster very quickly, and therefore would recommend not using our process but Hamiltonian Distance in the future.
 
 \subsection{Clustering Algorithm}
+
+\subsection{Implementation}
 
 \subsection{Controller}
 
