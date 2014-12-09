@@ -34,7 +34,8 @@ def do_cluster_algorithm(num_clusters, results, cluster_range):
     if (error < min_error):
       min_error = error;
       opt_clusters = num_clusters - i;
-    
+  
+  print "Optimal clusters: ", opt_clusters
   return opt_clusters
 
 def kmeans(data, num_means):
