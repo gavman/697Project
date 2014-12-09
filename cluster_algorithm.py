@@ -13,30 +13,33 @@ def do_cluster_algorithm(num_clusters, results, cluster_range):
   #results = create_kmean_data_frame(results)
 
   # run k-means with the desired number of clusters
-  min_error = kmeans(results, num_clusters);
-  print num_clusters, " error = ", min_error
-  opt_clusters = num_clusters;
-
+  errors = [kmeans(results, num_clusters)];
+  
   # run k-means for range of number of clusters
   for i in xrange(1, cluster_range + 1):
-    error = kmeans(results, num_clusters + i);
-    print (num_clusters + i), " error = ", error
-    if (error < min_error):
-      min_error = error;
-      opt_clusters = num_clusters + i;
+    errors += [kmeans(results, num_clusters + i)];
     
     tmp_num = num_clusters - 1;
     if (tmp_num <= 0):
       pass;
 
-    error = kmeans(results, num_clusters - i);
-    print (num_clusters - i), " error = ", error
-    if (error < min_error):
-      min_error = error;
-      opt_clusters = num_clusters - i;
+    errors[:0] = [kmeans(results, num_clusters - i)];
+
+  optCluster = 2;
+  for i in range(1,len(errors)):
+    dError = errors[i] - errors[i-1]
+
+    if (i == 2):
+      maxDDError = dError - dError_Last
+    elif (i > 2):
+      ddError = dError - dError_last
+      if (ddError > maxDDError)
+        optCluster = num_clusters + cluster_range - len(errors) + i + 1
+        maxDDError = ddError
+        
+    dErrorLast = dError
   
-  print "Optimal clusters: ", opt_clusters
-  return opt_clusters
+  return optCluster
 
 def kmeans(data, num_means):
     data_input = data.as_matrix().transpose()
