@@ -22,7 +22,6 @@ def do_genetic_algorithm(phi, sets):
             (pct, result) = naive_bayes(this_set, training_set, testing_set)
             pcts.append(pct)
             results.append(result)
-            avg_result += results;
 
         #find smallest index of two smallest pcts
         min_index = pcts.index(min(pcts))
@@ -184,7 +183,7 @@ def naive_bayes_total(word_sets, training_set, testing_set):
         guesses = [0,0]
         for j in word_sets.columns:
             words = word_sets[j].values
-            word_probs = all_word_probs[k]
+            word_probs = word_probs_all[k]
             k += 1
             #multiply the priors by likelihood of topic given each word in our set
             for found_word in [word for word in words if str(word) in title]:

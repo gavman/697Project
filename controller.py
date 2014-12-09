@@ -14,7 +14,7 @@ ga = __import__(args.genetic_algorithm)
 ca = __import__(args.cluster_algorithm)
 
 def main():
-    k = 2
+    k = 4
     actK = 0
 
     # Generating new word sets
@@ -22,7 +22,7 @@ def main():
     testing_set = pd.DataFrame.from_csv('data/testing_set.csv')
     all_words = pd.Series.from_csv('data/all_words.csv')
     num_sets = 5
-    words_per_set = 5
+    words_per_set = 10
 
     # Controller Constants
     phi = 1.0
@@ -37,10 +37,10 @@ def main():
     errMin = -2
 
     #cluster range
-    cluster_range = 1
+    cluster_range = 2
 
     # Genetic Algorithm Constants
-    numTrials = 15
+    numTrials = 25
     optima = pd.DataFrame();
 
     # Generalized Crowding Constants
@@ -79,8 +79,8 @@ def main():
         new_gen.to_csv('gens/new_gen_' + str(i) + '.csv')
 
         # Calculate
-        (pct,result) = ga.naive_bayes_total(new_gen, training_set, test_set)
-        print pct
+        (pct,result) = ga.naive_bayes_total(new_gen, training_set, testing_set)
+        print "Combined accuracy:", pct
 
 def generate_new_random_word_sets(num_sets, words_per_set, all_words):
     word_sets = pd.DataFrame()

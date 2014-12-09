@@ -3,6 +3,7 @@
 import pandas as pd
 import numpy as np
 import random
+from sklearn.cluster import KMeans
 
 #function do_cluster_algorithm
 	#takes number of clusters as an input 1
@@ -36,11 +37,15 @@ def do_cluster_algorithm(num_clusters, results, cluster_range):
     
   return opt_clusters
 
+def kmeans(data, num_means):
+    data_input = data.as_matrix().transpose()
+    return KMeans(n_clusters=num_means).fit(data_input).inertia_/len(data.columns)
+
 #function kmeans
     #takes the data as input 1
     #takes the number of means as input 2
 #data is a data frame where each column is a vector of data at one data point
-def kmeans(data, num_means):
+def old_kmeans(data, num_means):
     data.reset_index(drop=True, inplace=True)
     num_rows = len(data)
     maxes = data.max(axis = 1)
