@@ -18,6 +18,8 @@ def main():
     actK = 0
 
     # Generating new word sets
+    training_set = pd.DataFrame.from_csv('data/training_set.csv')
+    testing_set = pd.DataFrame.from_csv('data/testing_set.csv')
     all_words = pd.Series.from_csv('data/all_words.csv')
     num_sets = 5
     words_per_set = 5
@@ -76,8 +78,9 @@ def main():
 
         new_gen.to_csv('gens/new_gen_' + str(i) + '.csv')
 
-        #TODO: run the test set again through naive bayes, but using all the
-        #word sets instead of just one
+        # Calculate
+        (pct,result) = ga.naive_bayes_total(new_gen, training_set, test_set)
+        print pct
 
 def generate_new_random_word_sets(num_sets, words_per_set, all_words):
     word_sets = pd.DataFrame()

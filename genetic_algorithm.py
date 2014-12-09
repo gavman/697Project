@@ -16,11 +16,13 @@ def do_genetic_algorithm(phi, sets):
     while(len(sets.columns) > 1):
         pcts = list()
         results = list()
+        
         for column in sets.columns:
             this_set = sets[column]
             (pct, result) = naive_bayes(this_set, training_set, testing_set)
             pcts.append(pct)
             results.append(result)
+            avg_result += results;
 
         #find smallest index of two smallest pcts
         min_index = pcts.index(min(pcts))
@@ -37,7 +39,7 @@ def do_genetic_algorithm(phi, sets):
             this_set = sets[column]
             new_set = mutate(this_set, all_words, training_set, testing_set)
             sets[column] = new_set
-    
+        
     #return the one column
     to_return = sets[sets.columns[0]]
     return to_return, naive_bayes(to_return, training_set, testing_set)[1]
@@ -116,6 +118,85 @@ def naive_bayes(words, training_set, testing_set):
         #pick the topic with the greatest probability
         guess = probs.index(max(probs)) + topic_min
         actual_answer = training_set.Topic.values[i]
+        if guess == 1 and actual_answer == 1:
+            tp += 1
+        elif guess == 1 and actual_answer == 2:
+            fp += 1
+        elif guess == 2 and actual_answer == 2:
+            tn += 1
+        else:
+            fn += 1
+    results = list()
+    results.append(tp)
+    results.append(fp)
+    results.append(tn)
+    results.append(fn)
+    return (float(tp+tn)/testing_set.Title.count(), pd.Series(results))
+
+#words is a python list of key words
+def naive_bayes_total(word_sets, training_set, testing_set):
+    #topics
+    topic_min = 1
+    topic_max = 2
+    
+    priors = list()
+    total_count = training_set.Topic.count()
+    for yk in xrange(topic_min, topic_max+1):
+        this_data = training_set[training_set.Topic == yk]
+        class_count = this_data.Topic.count()
+        prior = float(class_count)/total_count
+        priors.append(prior)
+
+    #train
+    word_probs_all = list()
+    for i in word_sets.columns:
+        word_set = word_sets[i].values
+        word_probs = dict() #maps word to list of probs for each topic
+        for word in word_set:
+            try:
+                word_titles = training_set[training_set.Title.str.contains(word)]
+                this_word_probs = list()
+                word_count_all = word_titles.Title.count()
+                for topic in xrange(topic_min, topic_max+1):
+                    word_count = float(word_titles[training_set.Topic == topic].Title.count())
+                    if (word_count_all != 0):
+                        this_word_probs.append(word_count/word_count_all)
+                    else:
+                        #word never appreas in any topic, 1 for no change to prob
+                        this_word_probs.append(1.0)
+                word_probs[word] = this_word_probs
+            except:
+                word_probs[word] = list()
+                word_probs[word].append(1.)
+                word_probs[word].append(1.)
+        word_probs_all.append(word_probs)
+
+    #test
+    tp = 0
+    tn = 0
+    fp = 0
+    fn = 0
+    for i in xrange(testing_set.Title.count()):
+        title = testing_set.Title.values[i]
+        probs = copy.copy(priors)
+        k = 0
+        guesses = [0,0]
+        for j in word_sets.columns:
+            words = word_sets[j].values
+            word_probs = all_word_probs[k]
+            k += 1
+            #multiply the priors by likelihood of topic given each word in our set
+            for found_word in [word for word in words if str(word) in title]:
+                for topic in xrange(topic_min, topic_max+1):
+                    probs[topic-topic_min] *= word_probs.get(found_word)[topic-topic_min]
+            #pick the topic with the greatest probability
+            guess = probs.index(max(probs)) + topic_min
+            guesses[guess-1] += 1
+        actual_answer = training_set.Topic.values[i]
+        if (guesses[0] > guesses[1]):
+            guess = 1
+        else:
+            guess = 2
         if guess == 1 and actual_answer == 1:
             tp += 1
         elif guess == 1 and actual_answer == 2:
