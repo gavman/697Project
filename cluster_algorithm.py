@@ -25,20 +25,26 @@ def do_cluster_algorithm(num_clusters, results, cluster_range):
 
     errors[:0] = [kmeans(results, num_clusters - i)];
 
-  optCluster = 2;
+  optCluster = 1;
+  print "#Clusters:",num_clusters+cluster_range-len(errors)+1,"Error:",errors[0]
   for i in range(1,len(errors)):
+    print "#Clusters:",num_clusters+cluster_range-len(errors)+i+1,"Error:",errors[i]
     dError = errors[i] - errors[i-1]
+    print "dError:",dError
 
     if (i == 2):
-      maxDDError = dError - dError_Last
+      maxDDError = dError - dErrorLast
+      print "ddError:",maxDDError
     elif (i > 2):
-      ddError = dError - dError_last
-      if (ddError > maxDDError)
-        optCluster = num_clusters + cluster_range - len(errors) + i + 1
+      ddError = dError - dErrorLast
+      print "ddError:",ddError
+      if (ddError > maxDDError):
+        optCluster = num_clusters + cluster_range - len(errors) + i
         maxDDError = ddError
         
     dErrorLast = dError
   
+  print "Optimal#",optCluster
   return optCluster
 
 def kmeans(data, num_means):
