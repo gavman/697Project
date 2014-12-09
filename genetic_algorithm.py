@@ -40,7 +40,8 @@ def do_genetic_algorithm(phi, sets):
     
     #return the one column
     to_return = sets[sets.columns[0]]
-    return to_return, naive_bayes(to_return, training_set, testing_set)[1]
+    naive_bayes_results = naive_bayes(to_return, training_set, testing_set)
+    return to_return, naive_bayes_results
 
 #function mutate
     #takes a scaling factor which is the exploration/exploitation trade-off
