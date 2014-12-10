@@ -45,9 +45,10 @@ of local optima.
 \keywords{Controlled Clustering, Naive Bayes, KMeans, Title Category Classification} %I put some down...
 
 \section{Introduction}
-Our Intro
+In optimization problems there are often multiple local optima. In order to reduce the complexity of the solution space
 
-\section{Background and Previous Work}
+
+\section{Related Research}
 Background
 
 \section{Method}
@@ -74,6 +75,8 @@ Our genetic algorithm operated on a set of bags of words, and converged to a sin
 \indent In our genetic algorithm, we did not follow CITEPAPERHERE and user Hamiltonian Distance in the clustering algorithm, instead we decided to try something different and creative and used Naive Bayes results. We passed the number of true positives, true negatives, false positives, and false negatives to the clustering algorithm, hoping this would create diverse results with some bags of words strong in each case. In the end we found this approach did not fare well and the results converged to a single cluster very quickly, and therefore would recommend not using our process but Hamiltonian Distance in the future.
 
 \subsection{Clustering Algorithm}
+Our clustering algorithm operates based on the Objective K Nearest Neighbor function. For this algorithm, we use a variable number of nodes to group the 
+solution set from the genetic algorithm trials into clusters. For each number of nodes, we cluster the data using K-Means to 
 
 \subsection{Implementation}
 
