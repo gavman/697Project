@@ -45,8 +45,7 @@ of local optima.
 \keywords{Controlled Clustering, Naive Bayes, KMeans, Title Category Classification} %I put some down...
 
 \section{Introduction}
-In optimization problems there are often multiple local optima. In order to reduce the complexity of the solution space
-
+In determining optimal feature sets for classification, there are often multiple local optima. In order to reduce the computational complexity of dealing with a variable number of optima it desirable to refine the set of optima to a given size. This paper details the use of generalized crowding and a feedback controller to cluster a set of features
 
 \section{Related Research}
 Background
@@ -75,12 +74,13 @@ Our genetic algorithm operated on a set of bags of words, and converged to a sin
 \indent In our genetic algorithm, we did not follow CITEPAPERHERE and user Hamiltonian Distance in the clustering algorithm, instead we decided to try something different and creative and used Naive Bayes results. We passed the number of true positives, true negatives, false positives, and false negatives to the clustering algorithm, hoping this would create diverse results with some bags of words strong in each case. In the end we found this approach did not fare well and the results converged to a single cluster very quickly, and therefore would recommend not using our process but Hamiltonian Distance in the future.
 
 \subsection{Clustering Algorithm}
-Our clustering algorithm operates based on the Objective K Nearest Neighbor function. For this algorithm, we use a variable number of nodes to group the 
-solution set from the genetic algorithm trials into clusters. For each number of nodes, we cluster the data using K-Means to 
+Our clustering algorithm is based on the Objective K Nearest Neighbor function. The objective function works by running K-Means with a variable number of nodes used for clustering. For each element of the solution set created by the genetic algorithm trials, we calculate the number of true positives, false positives, true negatives, and false negative. A true positive or true negative represents the correct classification of a title, and conversely a false positive or false negative represents a failure to do so. This representation is possible because we are separating the titles into only two classes. Based on these statistics, we calculate a distance to each node based on the Euclidean distance metric. For K-Means, we group each element to the closest node, and re-calculate a mean node for each grouping. K-Means continues to iterate until the mean nodes remain constant between iterations. Once K-Means finishes iterating, we calculate the distance of each element to its group's mean node. The sum of these distances is our error for that given number of nodes.
+Based on the error for each number of nodes, we find the change in the error with respect to the change in the number of nodes. This change is the first derivative for our error. Next, we find the change in the first derivative with respect to the change in the number of nodes. This change is the second derivative for our error. Based on the maximum second derivative, we calculate the elbow point for the error versus number of nodes. For our feedback loop, the elbow point returned by our clustering algorithm represents the optimal number of nodes, or local optima, to use.
+
+\subsection{Feedback Controller}
+For controlling the exploration/exploitation term for the genetic algorithm, we use a PID controller. The set point for the controller is the desired number of clusters after crowding. The error is the difference between the set point and the returned number of clusters from the clustering algorithm. Based on this error, we calculate the change in the exploration/exploitation term for the next iteration of the feedback loop. The change is determined by calculating the change in error between iterations of the feedback loop, which is our derivative term, and the sum of all past errors, which is our integral term. By multiplying these terms and the error by set gains, we calculate the new exploration/exploitation term. The goal of implementing a full PID controller is to improve upon the efficiency of the entire pipeline by reducing the number of iterations till convergence to the desired number of clusters. The derivative term should improve the responsiveness of the controller while the integral term should ensure that the limit of the error goes to zero in time.
 
 \subsection{Implementation}
-
-\subsection{Controller}
 
 \section{Results}
 
@@ -91,13 +91,11 @@ As mentioned, in the future we would like to
 
 \section{Acknowledgments}
 
-\cite{salas:calculus}
-
-%
-% The following two commands are all you need in the
-% initial runs of your .tex file to
-% produce the bibliography for the citations in your paper.
-\bibliographystyle{abbrv}
-\bibliography{sigproc}  % sigproc.bib is the name of the Bibliography in this case
+\begin{thebibliography}{100}
+	
+	\bibitem{ole_feedback} Shi, J., Mengshoel, O.J., and Pal,D.K., "Feedback Control for Multi-modal Optimization using Genetic Algorithms," \emph{Carnegie Mellon University}.
+	\bibitem{feature_feedback} Vafaie, H. and Jong, K.D., "Genetic Algorithms as a Tool for Feature Selection in Machine Learning," \emph{Center for Artificial Intelligence, George Mason University}.
+	
+\end{thebibliography}
 
 \end{document}
