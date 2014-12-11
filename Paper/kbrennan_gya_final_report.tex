@@ -43,7 +43,7 @@ The problem of optimizing feature sets for use in classification is often multi-
 \indent One method for creating a fixed size solution set is through generalized crowding. Crowding groups solutions based on a given fitness function into a set of niches\cite{ole:feedback}. Using a scaling factor, generalized crowding controls the range of solutions  with respect to the given fitness function. In the case of evolutionary algorithms such as genetic algorithms, the scaling factor controls the exploration/exploitation parameter used in determining survival between generations. Control of the scaling factor therefore also controls the number of niches within a given solution space\cite{ole:feedback}.\\
 \indent In this paper, we detail using genetic algorithm to optimize feature sets for classifying newspaper titles into topics. For classification, each feature set is a set of bit-strings. Through several trials of a genetic algorithm, we create a set of locally optimized feature sets. With K nearest neighbor, we implement generalized crowding in order to cluster the solution set into a set of niches. We apply a feedback controller on the error between the desired number of niches and this returned number. In this paper, we consider the use a full PID controller in order to expand upon past research in this area. Using derivative and integral gains allows for greater control of the rate of convergence, overshoot, and steady state error when refining the number of  niches. Further information on the implementation of our algorithm is provided in the Methods section of our paper.  
 
-\section{Related Research}
+\section{Background}
 \subsection{Feature Selection}
 \cite{feature:feedback}
 
@@ -51,7 +51,7 @@ The problem of optimizing feature sets for use in classification is often multi-
 
 \subsection{Feedback Controller}
 
-\section{Method}
+\section{Algorithm}
 \begin{figure*}[t]
 \centering
 \fbox{
@@ -85,7 +85,11 @@ For controlling the exploration/exploitation term for the genetic algorithm, we 
 \subsection{Implementation}
 We implemented our pipeline using Python's PANDAS module. Python, a scripting language, is easy to work with and develop quickly which was important given the project had to be finished within a semester. PANDAS is built on top of Python's NumPy library, which is strictly typed and invokes C calls, significantly speeding up the slow execution of Python. Lastly, we implemented clustering using Python's scikit-learn library, a machine learning library. Scikit-learn is also built in NumPy, making passing data between the two libraries very simple. In the end we were able to run our pipeline very efficiently, with each iteration of the feedback loop taking on the order of seconds instead of minutes. This speed allowed us to try many different runs of various combinations of parameters and analyze the results.
 
-\section{Results}
+\section{Experiments}
+\subsection{Data}
+For our experiments, we used the Boydstun New York Times Front Page Data Set\cite{boydstun}. The data set contains every NYT front page article title from 1/1/1996 through 12/31/2006. The data set used ten different categories for classification. Each title can be marked as one or none of the given categories. In order to limit our algorithm to two topics, we chose "War on Terror" and "Presidential Elections". These two topics were chosen because they are similar enough that classifying titles a either one becomes a significant challenge and different enough that it is possible to differentiate between the two. Based on these two topics, we filtered the data set by removing any titles that did not fit into either of these two topics. Based on the remaining titles, we created a bag of words or bit-strings. With this bag of words, we create randomized sets of words with each set being a fixed size. These sets are the feature sets used in the later classification stages of the algorithm.
+ 
+\subsection{Results}
 In testing, we experimented with different controller gains, number of features per feature set, and number of trials of the genetic algorithm. For data, we recorded the clustering error per each number of niches used, the number of niches returned by the objective clustering algorithm, and the $\phi$, exploration/exploitation term, for each iteration of the control loop.
 \begin{figure}[t]
 \centering
@@ -117,7 +121,7 @@ Figure 4 shows the output of the control loop after each generation for several 
 \caption{The accuracy over several iterations of the control loop.}
 \label{fig:graph3}
 \end{figure}
-\indent Figure 5 and Figure 6 show the results of our experiments with the controller gains. Figure 5 shows the classification accuracy for each iteration of the control loop. Figure 6 shows the corresponding $\phi$ term used for the genetic algorithm based on the number of niches returned in the previous iteration. Trial 0 is with P = 0.1, I = 0, and D = 0. Trial 1 is with P = 1, I = 0, and D = 0. Trial 2 is with P = 1, I = 0, and D = 0.1. Trial 3 is with P = 1, I = 0.001, and D = 0.1. Trial 4 is with P = 10, I = 0, and D = 0.5. The results shows that the classification accuracy is invariant of the controller. Coupled with the results in Figure 4, this graph also shows that the $\phi$ term does not have a significant impact on the convergence in the number of niches. Figure 6 show $\phi$ term has a constant increase. This consistency is due to the fact that the error from each iteration controls the change in $\phi$ for the next iteration. Since the error is consistent, the change in $\phi$ is consistent.\\
+\indent Figure 5 and Figure 6 show the results of our experiments with the controller gains. The experiments were run with the set point, desired number of clusters, as 4. Figure 5 shows the classification accuracy for each iteration of the control loop. Figure 6 shows the corresponding $\phi$ term used for the genetic algorithm based on the number of niches returned in the previous iteration. Trial 0 is with P = 0.1, I = 0, and D = 0. Trial 1 is with P = 1, I = 0, and D = 0. Trial 2 is with P = 1, I = 0, and D = 0.1. Trial 3 is with P = 1, I = 0.001, and D = 0.1. Trial 4 is with P = 10, I = 0, and D = 0.5. The results shows that the classification accuracy is invariant of the controller. Coupled with the results in Figure 4, this graph also shows that the $\phi$ term does not have a significant impact on the convergence in the number of niches. Figure 6 show $\phi$ term has a constant increase. This consistency is due to the fact that the error from each iteration controls the change in $\phi$ for the next iteration. Since the error is consistent, the change in $\phi$ is consistent.\\
 \indent Based on all the results shown above, we conclude that the controller had minimal impact on the genetic algorithm. The unchanging results of the clustering algorithm show that, while our results do not show convergence, we cannot conclude that the controller does not have an impact on the efficiency of the algorithm. The results suggest that further experimentation with additional optimization algorithms is need to fully test the possibilities of a feedback controller. In addition, the results shows that with given fitness function for clustering, we may not be guaranteed to converge to desired number of clusters or optimal solutions. 
 
 \section{Conclusion and Future Work}
@@ -125,7 +129,13 @@ This paper details the use of genetic algorithm, clustering, and feedback contro
 \indent For future work, we would experiment with other distance metrics for clustering. As mentioned in the results section, the classification results proved to be similar to create substantial differences in clustering. This similarity caused the solution set to sometimes converge to a single cluster, which impede the feedback controller.\\
 \indent Another area for future work would be the creation of classification rules in the genetic algorithm. In our current algorithm, we relies solely on Naive Bayes as the classifier for a given feature. By expanding upon Naive Bayes, we could implement a decision tree based on the Naive Bayes results for each element of a given feature set. This expansion should improve the classification scores of the feature set as it considers combinations of words in a title rather just each word by itself.
 
-\bibliography{sigproc.bib}
-\bibliographystyle{plain}
+\begin{thebibliography}{100}
+	
+	\bibitem{ole:feedback} Shi, J., Mengshoel, O.J., and Pal,D.K., "Feedback Control for Multi-modal Optimization using Genetic Algorithms," \emph{Carnegie Mellon University}.
+	\bibitem{feature:feedback} Vafaie, H. and Jong, K.D., "Genetic Algorithms as a Tool for Feature Selection in Machine Learning," \emph{Center for Artificial Intelligence, George Mason University}.
+	\bibitem{galan:feedback} Galan, S.F., and Mengshoel, O.J, "Generalized Crowding for Genetic Algorithms," \emph{Carnegie Mellon University}.
+	\bibitem{boydstun}The University of Texas at Austin. (2006). "Boydstun NYT Front Page Dataset". <http://www.policyagendas.org/document/boydstun-nyt-front-page-dataset>
+	
+\end{thebibliography}
 
 \end{document}
