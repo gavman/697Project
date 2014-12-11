@@ -30,18 +30,26 @@ Gavriel Adler\\
 
 \maketitle
 \begin{abstract}
-In this paper, we explore using a feedback controller for fixing the number of local optima in an optimization problem. In particular, we implement the controller for choosing optimal feature sets for classification of newspaper headings. With a genetic algorithm using Naive Bayes as a fitness function, we create a set of locally optimal feature sets. With a generalized crowding algorithm based on K nearest neighbor, we cluster the solution set into a fixed number of niches. The number of niches is determined by the error of the clustering. The feedback controller uses this number to tune the genetic algorithm's exploration parameter. By controlling this parameter, we aim to control the solution set created through trials of the genetic algorithm, and to converge the number of niches in the solution set to a desired number.	
+In optimizing feature sets for classification, there are often multiple local optima when using tools such as genetic algorithms. In order to reduce complexity and computational cost, it is often desirable to deal with only a fixed number of solutions. One method for refining the solution set is niching through generalized crowding.\\
+\indent In this paper, we explore using a genetic algorithm for creating optimized feature sets for classification problems. Through several trials of a genetic algorithm, we create a solution space of locally optimal feature sets. Using generalized crowding with K Nearest Neighbor clustering, we refine the solution space into a set of niches. Based on the difference between a desired number of niches and the returned value, we implement a feedback controller for the exploration/exploitation of the genetic algorithm. By tuning this parameter, we adjust the range of the solution space through several trials till it converges to a desired number of niches. After testing on classifying newspaper titles, the algorithm did not show the controller to be effective in converging the solution space to a desired number of niches. Control over the exploration/exploitation parameter did not have sufficient power to augment the number of niches.
 \end{abstract}
 
 \terms{Classification, Feedback, Stochastic Optimization}
 
-\keywords{Controlled Clustering, Naive Bayes, KMeans, Title Category Classification} %I put some down...
+\keywords{Controlled Clustering, Naive Bayes, KMeans, Title Category Classification}
 
 \section{Introduction}
-In determining optimal feature sets for classification, there are often multiple local optima. In order to reduce the computational complexity of dealing with a variable number of optima it desirable to refine the set of optima to a given size. This paper details the use of generalized crowding and a feedback controller to cluster a set of features
+The problem of optimizing feature sets for use in classification is often multi-modal. Often there are variable number of local optima each with unique characteristics. Although multiple solutions often give a better representation of the solution space for a given optimization, having a variable number of solutions can drastically increase the complexity and cost of a given algorithm.\\
+\indent One method for creating a fixed size solution set is through generalized crowding. Crowding groups solutions based on a given fitness function into a set of niches\cite{ole:feedback}. Using a scaling factor, generalized crowding controls the range of solutions  with respect to the given fitness function. In the case of evolutionary algorithms such as genetic algorithms, the scaling factor controls the exploration/exploitation parameter used in determining survival between generations. Control of the scaling factor therefore also controls the number of niches within a given solution space\cite{ole:feedback}.\\
+\indent In this paper, we detail using genetic algorithm to optimize feature sets for classifying newspaper titles into topics. For classification, each feature set is a set of bit-strings. Through several trials of a genetic algorithm, we create a set of locally optimized feature sets. With K nearest neighbor, we implement generalized crowding in order to cluster the solution set into a set of niches. We apply a feedback controller on the error between the desired number of niches and this returned number. In this paper, we consider the use a full PID controller in order to expand upon past research in this area. Using derivative and integral gains allows for greater control of the rate of convergence, overshoot, and steady state error when refining the number of  niches. Further information on the implementation of our algorithm is provided in the Methods section of our paper.  
 
 \section{Related Research}
-Our algorithm expands on previous research on controlling cluster with feedback.\cite{ole:feedback}. This research focused on optimizing.
+\subsection{Feature Selection}
+\cite{feature:feedback}
+
+\subsection{Generalized Crowding}
+
+\subsection{Feedback Controller}
 
 \section{Method}
 \begin{figure*}[t]
@@ -80,13 +88,10 @@ We implemented our pipeline using Python's PANDAS module. Python, a scripting la
 \section{Results}
 In the end we found this approach did not fare well and the results converged to a single cluster very quickly, and therefore would recommend not using our process but Hamming
 
-\section{Conclusions}
-
-\section{Future Work}
-For future work, we would experiment with other distance metrics for clustering. As mentioned in the results section, the classification results proved to be similar to create substantial differences in clustering. This similarity caused the solution set to sometimes converge to a single cluster, which impede the feedback controller.\\
+\section{Conclusion and Future Work}
+This paper details the use of genetic algorithm, clustering, and feedback control in order to fixed-size optimized feature sets for classification. A PID controller adjusts the parameters of the genetic algorithm in order to control the range of the solution space. Clustering groups the solution space into a set of niches. This set of niches determines the error for the control loop in the next iteration of the feedback loop. This paper explores the use of derivative and integral terms in order to increase the responsiveness of the controller. In addition, it explore the use of different distance metrics used for clustering in order to investigate the characteristics of each of the solution space's niches. Although the results did not yield great success in controlling the solution space, the work detailed leaves several areas for further investigation and experimentation.\\
+\indent For future work, we would experiment with other distance metrics for clustering. As mentioned in the results section, the classification results proved to be similar to create substantial differences in clustering. This similarity caused the solution set to sometimes converge to a single cluster, which impede the feedback controller.\\
 \indent Another area for future work would be the creation of classification rules in the genetic algorithm. In our current algorithm, we relies solely on Naive Bayes as the classifier for a given feature. By expanding upon Naive Bayes, we could implement a decision tree based on the Naive Bayes results for each element of a given feature set. This expansion should improve the classification scores of the feature set as it considers combinations of words in a title rather just each word by itself.
-
-\section{Acknowledgments}
 
 \bibliography{sigproc.bib}
 \bibliographystyle{plain}
