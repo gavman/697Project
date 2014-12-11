@@ -30,17 +30,10 @@ Gavriel Adler\\
 
 \maketitle
 \begin{abstract}
-In this paper, we develop a method that uses a feedback controller in order to control the desired number
-of local optima.
+In this paper, we explore using a feedback controller for fixing the number of local optima in an optimization problem. In particular, we implement the controller for choosing optimal feature sets for classification of newspaper headings. With a genetic algorithm using Naive Bayes as a fitness function, we create a set of locally optimal feature sets. With a generalized crowding algorithm based on K nearest neighbor, we cluster the solution set into a fixed number of niches. The number of niches is determined by the error of the clustering. The feedback controller uses this number to tune the genetic algorithm's exploration parameter. By controlling this parameter, we aim to control the solution set created through trials of the genetic algorithm, and to converge the number of niches in the solution set to a desired number.	
 \end{abstract}
 
-%%@Kevin-->Not sure what these are
-% A category with the (minimum) three required fields
-%\category{H.4}{Information Systems Applications}{Miscellaneous} %I commented out this line
-%A category including the fourth, optional field follows...
-%\category{D.2.8}{Software Engineering}{Metrics}[complexity measures, performance measures] %I commented out this line
-
-\terms{Classification, Feedback, Stochastic Optimization} %I put some down...
+\terms{Classification, Feedback, Stochastic Optimization}
 
 \keywords{Controlled Clustering, Naive Bayes, KMeans, Title Category Classification} %I put some down...
 
@@ -48,7 +41,7 @@ of local optima.
 In determining optimal feature sets for classification, there are often multiple local optima. In order to reduce the computational complexity of dealing with a variable number of optima it desirable to refine the set of optima to a given size. This paper details the use of generalized crowding and a feedback controller to cluster a set of features
 
 \section{Related Research}
-Background
+Our algorithm expands on previous research on controlling cluster with feedback.\cite{ole:feedback}. This research focused on optimizing.
 
 \section{Method}
 \begin{figure*}[t]
@@ -65,17 +58,18 @@ Our pipeline, as seen in Figure~\ref{fig:pipeline}, consists of a few independen
 \begin{figure}[t]
 \centering
 \fbox{\rule{0pt}{2in}
-  \includegraphics[width=0.5\textwidth]{genetic_algo.png}}
+  \includegraphics[width=0.45\textwidth]{genetic_algo.png}}
 \caption{The flow of one iteration of the genetic algorithm}
 \label{fig:genetic_algo}
 \end{figure}
 Our genetic algorithm operated on a set of bags of words, and converged to a single locally optimal bag of words. At each round of the genetic algorithm, the Naive Bayes score on the testing set was calculated for each bag of words. The lowest two scores competed for survival, and the victor was based on both the $\phi$ exploration/exploitation term and a random coin flip. After one bag was killed, each remaining bag was mutated and additional randomized cross-over between trials was added in to further diversity. Our solution set was created by running several trials of the genetic algorithm on many randomly generated sets of bags of words.\\
 \indent In the mutation step, the algorithm attempted to replace each word in the bag of words with a new word taken from the titles in the training set. If the Naive Bayes score of the bag of words with the new word was higher than it was with the old word, the new word replaced the old word, otherwise the new word was discarded.\\
-\indent In our genetic algorithm, we did not follow CITEPAPERHERE and user Hamiltonian Distance in the clustering algorithm, instead we decided to try something different and creative and used Naive Bayes results. We passed the number of true positives, true negatives, false positives, and false negatives to the clustering algorithm, hoping this would create diverse results with some bags of words strong in each case. In the end we found this approach did not fare well and the results converged to a single cluster very quickly, and therefore would recommend not using our process but Hamiltonian Distance in the future.
+\indent This process of testing with Naive Bayes continues till only a single bag of words is left. We add this bag of words to our solution set, and after all the trials of the genetic algorithm are finished we have a set locally optimal solutions. This solution set is then passed onto the clustering algorithm.
 
 \subsection{Clustering Algorithm}
-Our clustering algorithm is based on the Objective K Nearest Neighbor function. The objective function works by running K-Means with a variable number of nodes used for clustering. For each element of the solution set created by the genetic algorithm trials, we calculate the number of true positives, false positives, true negatives, and false negative. A true positive or true negative represents the correct classification of a title, and conversely a false positive or false negative represents a failure to do so. This representation is possible because we are separating the titles into only two classes. Based on these statistics, we calculate a distance to each node based on the Euclidean distance metric. For K-Means, we group each element to the closest node, and re-calculate a mean node for each grouping. K-Means continues to iterate until the mean nodes remain constant between iterations. Once K-Means finishes iterating, we calculate the distance of each element to its group's mean node. The sum of these distances is our error for that given number of nodes.
-Based on the error for each number of nodes, we find the change in the error with respect to the change in the number of nodes. This change is the first derivative for our error. Next, we find the change in the first derivative with respect to the change in the number of nodes. This change is the second derivative for our error. Based on the maximum second derivative, we calculate the elbow point for the error versus number of nodes. For our feedback loop, the elbow point returned by our clustering algorithm represents the optimal number of nodes, or local optima, to use.
+Our clustering algorithm is based on the Objective K Nearest Neighbor function. The objective function works by running K-Means with a variable number of nodes used for clustering. For each element of the solution set created by the genetic algorithm trials, we calculate the number of true positives, false positives, true negatives, and false negative. A true positive or true negative represents the correct classification of a title, and conversely a false positive or false negative represents a failure to do so. This representation is possible because we are separating the titles into only two classes. We used these statistics, instead of other distance metrics such as the Hamming distance as used in previous research\cite{ole:feedback}, in order to cluster the solutions by characteristics. For instance, to have on group of solutions with minimal false positive or another with minimal false negatives.\\
+\indent Based on these statistics, we calculate a distance to each node based on the Euclidean distance metric. For K-Means, we group each element to the closest node, and re-calculate a mean node for each grouping. K-Means continues to iterate until the mean nodes remain constant between iterations. Once K-Means finishes iterating, we calculate the distance of each element to its group's mean node. The sum of these distances is our error for that given number of nodes.\\
+\indent Based on the error for each number of nodes, we find the change in the error with respect to the change in the number of nodes. This change is the first derivative for our error. Next, we find the change in the first derivative with respect to the change in the number of nodes. This change is the second derivative for our error. Based on the maximum second derivative, we calculate the elbow point for the error versus number of nodes. For our feedback loop, the elbow point returned by our clustering algorithm represents the optimal number of nodes, or local optima, to use.
 
 \subsection{Feedback Controller}
 For controlling the exploration/exploitation term for the genetic algorithm, we use a PID controller. The set point for the controller is the desired number of clusters after crowding. The error is the difference between the set point and the returned number of clusters from the clustering algorithm. Based on this error, we calculate the change in the exploration/exploitation term for the next iteration of the feedback loop. The change is determined by calculating the change in error between iterations of the feedback loop, which is our derivative term, and the sum of all past errors, which is our integral term. By multiplying these terms and the error by set gains, we calculate the new exploration/exploitation term. The goal of implementing a full PID controller is to improve upon the efficiency of the entire pipeline by reducing the number of iterations till convergence to the desired number of clusters. The derivative term should improve the responsiveness of the controller while the integral term should ensure that the limit of the error goes to zero in time.
@@ -83,16 +77,17 @@ For controlling the exploration/exploitation term for the genetic algorithm, we 
 \subsection{Implementation}
 
 \section{Results}
+In the end we found this approach did not fare well and the results converged to a single cluster very quickly, and therefore would recommend not using our process but Hamming
 
 \section{Conclusions}
-\cite{ole:feedback}
 
 \section{Future Work}
-As mentioned, in the future we would like to 
+For future work, we would experiment with other distance metrics for clustering. As mentioned in the results section, the classification results proved to be similar to create substantial differences in clustering. This similarity caused the solution set to sometimes converge to a single cluster, which impede the feedback controller.\\
+\indent Another area for future work would be the creation of classification rules in the genetic algorithm. In our current algorithm, we relies solely on Naive Bayes as the classifier for a given feature. By expanding upon Naive Bayes, we could implement a decision tree based on the Naive Bayes results for each element of a given feature set. This expansion should improve the classification scores of the feature set as it considers combinations of words in a title rather just each word by itself.
 
 \section{Acknowledgments}
 
-\bibliography{sigproc}
+\bibliography{sigproc.bib}
 \bibliographystyle{plain}
 
 \end{document}
