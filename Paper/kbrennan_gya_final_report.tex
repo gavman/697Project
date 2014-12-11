@@ -86,7 +86,39 @@ For controlling the exploration/exploitation term for the genetic algorithm, we 
 We implemented our pipeline using Python's PANDAS module. Python, a scripting language, is easy to work with and develop quickly which was important given the project had to be finished within a semester. PANDAS is built on top of Python's NumPy library, which is strictly typed and invokes C calls, significantly speeding up the slow execution of Python. Lastly, we implemented clustering using Python's scikit-learn library, a machine learning library. Scikit-learn is also built in NumPy, making passing data between the two libraries very simple. In the end we were able to run our pipeline very efficiently, with each iteration of the feedback loop taking on the order of seconds instead of minutes. This speed allowed us to try many different runs of various combinations of parameters and analyze the results.
 
 \section{Results}
-In the end we found this approach did not fare well and the results converged to a single cluster very quickly, and therefore would recommend not using our process but Hamming
+In testing, we experimented with different controller gains, number of features per feature set, and number of trials of the genetic algorithm. For data, we recorded the clustering error per each number of niches used, the number of niches returned by the objective clustering algorithm, and the $\phi$, exploration/exploitation term, for each iteration of the control loop.
+\begin{figure}[t]
+\centering
+\fbox{\rule{0pt}{2in}
+  \includegraphics[width=0.45\textwidth]{graph2.png}}
+\caption{A sample of the clustering error versus number of niches created by the clustering algorithm.}
+\label{fig:graph1}
+\end{figure}
+A sample representation of the objective clustering algorithm is shown in Figure 3. The graph shows the clustering error, or the sum of the distances of each element of the solution set to its respective node. Based on this error, we calculate the first and second derivatives of the error with respect to number of niches used for clustering. Our algorithm determines the optimal number of niches to be the point with the maximum second derivative. The result of the iteration displayed in this graph is two niches for clustering. This graph is representative of the majority of the trials of our entire algorithm. Even through varying the $\phi$ term and the number of words per set, overall the number of niches remains at 2. This result is shown in Figure 4.
+\begin{figure}[t]
+\centering
+\fbox{\rule{0pt}{2in}
+  \includegraphics[width=0.45\textwidth]{graph1.png}}
+\caption{The number of niches chosen by the clustering algorithm across the iterations of the feedback loop.}
+\label{fig:graph2}
+\end{figure}
+Figure 4 shows the output of the control loop after each generation for several different trials. Trial 0 is the baseline with a proportional controller with a gain of 0.01 and five bit-strings per feature set. Trial 1 is with a proportional and derivative controller with gains of 1 and 0.1 and five bit-strings per feature set. Trial 2 is with the same controller as Trial 0, but with 10 bit-strings per feature set. Trial 3 is with the same controller as Trial 0, but with 15 bit-strings per feature set. The graph shows that the returned number of niches is invariant to these parameters. In addition, we noted that the classification accuracy remained constant at approximately seventy percent with a margin of 0.02. This accuracy is approximately equal to the score obtained when using our entire bag of words as a classifier. These results shows that not only does the number of niches not converge given changes to the $\phi$ term, but also that accuracy remains relatively consistent even with the reduction to only five bit-strings per feature set.\\
+\begin{figure}[t]
+\centering
+\fbox{\rule{0pt}{2in}
+  \includegraphics[width=0.45\textwidth]{graph3.png}}
+\caption{The exploration/exploitation term over several iterations of the control loop.}
+\label{fig:graph3}
+\end{figure}
+\begin{figure}[t]
+\centering
+\fbox{\rule{0pt}{2in}
+  \includegraphics[width=0.45\textwidth]{graph3.png}}
+\caption{The accuracy over several iterations of the control loop.}
+\label{fig:graph3}
+\end{figure}
+\indent Figure 5 and Figure 6 show the results of our experiments with the controller gains. Figure 5 shows the classification accuracy for each iteration of the control loop. Figure 6 shows the corresponding $\phi$ term used for the genetic algorithm based on the number of niches returned in the previous iteration. Trial 0 is with P = 0.1, I = 0, and D = 0. Trial 1 is with P = 1, I = 0, and D = 0. Trial 2 is with P = 1, I = 0, and D = 0.1. Trial 3 is with P = 1, I = 0.001, and D = 0.1. Trial 4 is with P = 10, I = 0, and D = 0.5. The results shows that the classification accuracy is invariant of the controller. Coupled with the results in Figure 4, this graph also shows that the $\phi$ term does not have a significant impact on the convergence in the number of niches. Figure 6 show $\phi$ term has a constant increase. This consistency is due to the fact that the error from each iteration controls the change in $\phi$ for the next iteration. Since the error is consistent, the change in $\phi$ is consistent.\\
+\indent Based on all the results shown above, we conclude that the controller had minimal impact on the genetic algorithm. The unchanging results of the clustering algorithm show that, while our results do not show convergence, we cannot conclude that the controller does not have an impact on the efficiency of the algorithm. The results suggest that further experimentation with additional optimization algorithms is need to fully test the possibilities of a feedback controller. In addition, the results shows that with given fitness function for clustering, we may not be guaranteed to converge to desired number of clusters or optimal solutions. 
 
 \section{Conclusion and Future Work}
 This paper details the use of genetic algorithm, clustering, and feedback control in order to fixed-size optimized feature sets for classification. A PID controller adjusts the parameters of the genetic algorithm in order to control the range of the solution space. Clustering groups the solution space into a set of niches. This set of niches determines the error for the control loop in the next iteration of the feedback loop. This paper explores the use of derivative and integral terms in order to increase the responsiveness of the controller. In addition, it explore the use of different distance metrics used for clustering in order to investigate the characteristics of each of the solution space's niches. Although the results did not yield great success in controlling the solution space, the work detailed leaves several areas for further investigation and experimentation.\\
